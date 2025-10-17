@@ -4,15 +4,14 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider; // <-- Pastikan ini di-import
+// Kita tidak lagi butuh RouteServiceProvider di sini
+// use App\Providers\RouteServiceProvider; 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Validation\Rules; // <-- Pastikan ini ada
-
 
 class AuthenticatedSessionController extends Controller
 {
@@ -30,41 +29,32 @@ class AuthenticatedSessionController extends Controller
     /**
      * Menangani permintaan otentikasi yang masuk.
      */
-    // app/Http/Controllers/Auth/RegisteredUserController.php
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
 
-public function store(Request $request): RedirectResponse
-{
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-    ]);
+        $request->session()->regenerate();
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'role' => 'calon_santri', // Peran default untuk pendaftar baru
-    ]);
+        $user = $request->user();
 
-    event(new Registered($user));
+        // --- LOGIKA REDIRECT FINAL ---
+        
+        // Daftar peran yang harus diarahkan ke Beranda
+        $guestRoles = ['calon_santri'];
 
-    Auth::login($user);
+        if (in_array($user->role, $guestRoles)) {
+            // Jika peran pengguna ada di dalam daftar $guestRoles, arahkan ke Beranda.
+            return redirect()->route('home');
+        }
 
-    // === PERBAIKAN LOGIKA REDIRECT DI SINI ===
-
-    // Jika peran user yang baru mendaftar adalah 'calon_santri' atau 'wali_santri'
-    if ($user->role === 'calon_santri' ) {
-        // Arahkan mereka ke Beranda
-        return redirect(route('beranda'));
+        // Untuk semua peran lainnya (psb, keuangan, admin, dll.),
+        // arahkan ke Dashboard. Menggunakan redirect()->intended() adalah
+        // praktik yang baik untuk admin.
+        return redirect()->intended(route('dashboard'));
     }
 
-    // Untuk peran lainnya, arahkan ke Dashboard
-    return redirect(RouteServiceProvider::HOME);
-}
-
     /**
-     * Menghancurkan sesi otentikasi.
+     * Menghancurkan sesi otentikasi (logout).
      */
     public function destroy(Request $request): RedirectResponse
     {

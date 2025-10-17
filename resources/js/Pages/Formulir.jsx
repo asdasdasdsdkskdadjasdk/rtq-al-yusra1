@@ -7,10 +7,10 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-// Komponen khusus untuk input file
+// Komponen reusable untuk input file
 function FileInput({ label, name, onchange, error }) {
     return (
-        <div>
+        <div className="md:col-span-2"> {/* File input dibuat full width */}
             <InputLabel htmlFor={name} value={label} />
             <input
                 id={name}
@@ -24,33 +24,39 @@ function FileInput({ label, name, onchange, error }) {
     );
 }
 
-export default function Formulir({ program, auth }) { // Menerima 'program' sebagai props
-    // Inisialisasi form dengan semua field yang dibutuhkan
+export default function Formulir({ auth, program }) {
     const { data, setData, post, processing, errors, progress } = useForm({
+        // Data program (hidden)
+        program_nama: program.nama,
+        program_jenis: program.jenis,
+        // Data Diri
+        nik: '',
         nama: '',
         no_hp: '',
         email: '',
-        tanggal_lahir: '',
         tempat_lahir: '',
-        nama_orang_tua: '',
-        alamat: '',
+        tanggal_lahir: '',
         umur: '',
         jenis_kelamin: '',
+        alamat: '',
+        cabang: '',
+        // Data Wali
+        nama_orang_tua: '',
+        // Berkas
         ijazah_terakhir: null,
         kartu_keluarga: null,
         pas_foto: null,
-        skbb: null, // Surat Keterangan Berkelakuan Baik
-        sks: null, // Surat Keterangan Sehat
+        skbb: null,
+        sks: null,
     });
 
-    // Fungsi untuk handle submit form
     function handleSubmit(e) {
         e.preventDefault();
         post(route('formulir.store'));
     }
 
     return (
-        <AppLayout auth={auth}> {/* <-- Teruskan ke AppLayout */}
+        <AppLayout auth={auth}>
             <Head title={`Formulir ${program.nama}`} />
 
             <div className="relative bg-gray-800 py-20" style={{ backgroundImage: "url('/images/rtq.jpg')", backgroundSize: 'cover', backgroundAttachment: 'fixed', backgroundPosition: 'center' }}>
@@ -66,29 +72,85 @@ export default function Formulir({ program, auth }) { // Menerima 'program' seba
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Baris 1 */}
+                            {/* NIK */}
                             <div>
-                                <InputLabel htmlFor="nama" value="Nama" />
-                                <TextInput id="nama" value={data.nama} onChange={e => setData('nama', e.target.value)} className="mt-1 block w-full" />
+                                <InputLabel htmlFor="nik" value="NIK" />
+                                <TextInput id="nik" value={data.nik} onChange={e => setData('nik', e.target.value)} className="mt-1 block w-full" required />
+                                <InputError message={errors.nik} className="mt-2" />
+                            </div>
+                            {/* Nama */}
+                            <div>
+                                <InputLabel htmlFor="nama" value="Nama Lengkap" />
+                                <TextInput id="nama" value={data.nama} onChange={e => setData('nama', e.target.value)} className="mt-1 block w-full" required />
                                 <InputError message={errors.nama} className="mt-2" />
                             </div>
+                            {/* No HP */}
                             <div>
-                                <InputLabel htmlFor="no_hp" value="No Hp" />
-                                <TextInput id="no_hp" value={data.no_hp} onChange={e => setData('no_hp', e.target.value)} className="mt-1 block w-full" />
+                                <InputLabel htmlFor="no_hp" value="No. Handphone" />
+                                <TextInput id="no_hp" type="tel" value={data.no_hp} onChange={e => setData('no_hp', e.target.value)} className="mt-1 block w-full" required />
                                 <InputError message={errors.no_hp} className="mt-2" />
                             </div>
+                            {/* Email */}
+                            <div>
+                                <InputLabel htmlFor="email" value="Email" />
+                                <TextInput id="email" type="email" value={data.email} onChange={e => setData('email', e.target.value)} className="mt-1 block w-full" required />
+                                <InputError message={errors.email} className="mt-2" />
+                            </div>
+                            {/* Tempat Lahir */}
+                            <div>
+                                <InputLabel htmlFor="tempat_lahir" value="Tempat Lahir" />
+                                <TextInput id="tempat_lahir" value={data.tempat_lahir} onChange={e => setData('tempat_lahir', e.target.value)} className="mt-1 block w-full" required />
+                                <InputError message={errors.tempat_lahir} className="mt-2" />
+                            </div>
+                            {/* Tanggal Lahir */}
+                            <div>
+                                <InputLabel htmlFor="tanggal_lahir" value="Tanggal Lahir" />
+                                <TextInput id="tanggal_lahir" type="date" value={data.tanggal_lahir} onChange={e => setData('tanggal_lahir', e.target.value)} className="mt-1 block w-full" required />
+                                <InputError message={errors.tanggal_lahir} className="mt-2" />
+                            </div>
+                            {/* Umur */}
+                            <div>
+                                <InputLabel htmlFor="umur" value="Umur" />
+                                <TextInput id="umur" type="number" value={data.umur} onChange={e => setData('umur', e.target.value)} className="mt-1 block w-full" required />
+                                <InputError message={errors.umur} className="mt-2" />
+                            </div>
+                             {/* Jenis Kelamin */}
+                             <div>
+                                <InputLabel htmlFor="jenis_kelamin" value="Jenis Kelamin" />
+                                <select id="jenis_kelamin" value={data.jenis_kelamin} onChange={e => setData('jenis_kelamin', e.target.value)} className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                    <option value="">Pilih Jenis Kelamin</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                                <InputError message={errors.jenis_kelamin} className="mt-2" />
+                            </div>
+                            {/* Alamat */}
+                            <div className="md:col-span-2">
+                                <InputLabel htmlFor="alamat" value="Alamat Lengkap" />
+                                <textarea id="alamat" value={data.alamat} onChange={e => setData('alamat', e.target.value)} className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" rows="3" required></textarea>
+                                <InputError message={errors.alamat} className="mt-2" />
+                            </div>
+                             {/* Cabang */}
+                             <div>
+                                <InputLabel htmlFor="cabang" value="Cabang" />
+                                <TextInput id="cabang" value={data.cabang} onChange={e => setData('cabang', e.target.value)} className="mt-1 block w-full" required />
+                                <InputError message={errors.cabang} className="mt-2" />
+                            </div>
+                            {/* Nama Orang Tua */}
+                            <div>
+                                <InputLabel htmlFor="nama_orang_tua" value="Nama Orang Tua / Wali" />
+                                <TextInput id="nama_orang_tua" value={data.nama_orang_tua} onChange={e => setData('nama_orang_tua', e.target.value)} className="mt-1 block w-full" required />
+                                <InputError message={errors.nama_orang_tua} className="mt-2" />
+                            </div>
 
-                            {/* ... Tambahkan semua text input lainnya dengan pola yang sama ... */}
-
-                            {/* Contoh File Input */}
-                            <FileInput label="Ijazah terakhir" name="ijazah_terakhir" error={errors.ijazah_terakhir} onchange={e => setData('ijazah_terakhir', e.target.files[0])} />
-                            <FileInput label="Kartu Keluarga" name="kartu_keluarga" error={errors.kartu_keluarga} onchange={e => setData('kartu_keluarga', e.target.files[0])} />
-                            
-                            {/* Tambahkan semua file input lainnya */}
-
+                            {/* Berkas */}
+                            <FileInput label="Upload Ijazah Terakhir" name="ijazah_terakhir" error={errors.ijazah_terakhir} onchange={e => setData('ijazah_terakhir', e.target.files[0])} />
+                            <FileInput label="Upload Kartu Keluarga" name="kartu_keluarga" error={errors.kartu_keluarga} onchange={e => setData('kartu_keluarga', e.target.files[0])} />
+                            <FileInput label="Upload Pas Foto" name="pas_foto" error={errors.pas_foto} onchange={e => setData('pas_foto', e.target.files[0])} />
+                            <FileInput label="Upload Surat Keterangan Berkelakuan Baik (Sekolah)" name="skbb" error={errors.skbb} onchange={e => setData('skbb', e.target.files[0])} />
+                            <FileInput label="Upload Surat Keterangan Sehat (Rumah Sakit)" name="sks" error={errors.sks} onchange={e => setData('sks', e.target.files[0])} />
                         </div>
                         
-                        {/* Progress bar untuk file upload */}
                         {progress && (
                             <div className="w-full bg-gray-200 rounded-full mt-6">
                                 <div className="bg-alyusra-green text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style={{ width: `${progress.percentage}%` }}>

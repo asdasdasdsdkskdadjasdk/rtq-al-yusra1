@@ -24,7 +24,8 @@ const NavLink = ({ href, active, children }) => (
 const navigationMenu = {
     psb: [
         { name: 'Dasboard', href: route('dashboard'), icon: DashboardIcon, current: 'dashboard' },
-        { name: 'Pendaftaran', href: '#', icon: PendaftaranIcon, current: 'pendaftaran' },
+        // UBAH HREF DI SINI
+        { name: 'Pendaftaran', href: route('psb.pendaftaran.index'), icon: PendaftaranIcon, current: 'psb.pendaftaran.index' },
         { name: 'Status Lulus', href: '#', icon: StatusLulusIcon, current: 'status.lulus' },
         { name: 'Pengaturan Jadwal', href: '#', icon: PengaturanJadwalIcon, current: 'pengaturan.jadwal' },
     ],
