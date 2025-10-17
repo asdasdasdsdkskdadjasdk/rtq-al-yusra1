@@ -66,7 +66,7 @@ export default function Pendaftaran({ auth, flash = {} }) {
                     <div className="mt-6 flex justify-end space-x-2">
                         <SecondaryButton onClick={closeModal}>Batal</SecondaryButton>
                         <Link href={route('login')}>
-                            <PrimaryButton>Login Sekarang</PrimaryButton>
+                            <PrimaryButton>Login sekarang</PrimaryButton>
                         </Link>
                     </div>
                 </div>
